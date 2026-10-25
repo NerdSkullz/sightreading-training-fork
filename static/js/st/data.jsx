@@ -8,7 +8,7 @@ import {
   ProgressionGenerator, PositionGenerator, IntervalGenerator
 } from "st/generators"
 
-import {ChordGenerator, MultiKeyChordGenerator} from "st/chord_generators"
+import {ChordGenerator, MultiKeyChordGenerator, CHORD_EXTENSIONS} from "st/chord_generators"
 import {GStaff, FStaff, GrandStaff, ChordStaff} from "st/components/staves"
 
 let smoothInput = {
@@ -298,11 +298,10 @@ export const GENERATORS = [
         ]
       },
       {
-        name: "notes",
-        type: "range",
-        default: 3,
-        min: 3,
-        max: 4,
+        // triads by default, each toggle adds a tone on top
+        name: "extensions",
+        type: "toggles",
+        options: Object.keys(CHORD_EXTENSIONS),
       },
       {
         name: "ignoreAbove",

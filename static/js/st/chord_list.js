@@ -34,8 +34,9 @@ export default class ChordList extends Array {
     }
   }
 
+  // notes must include every tone of the chord, and nothing outside of it
   matchesHead(notes) {
-    return this[0].containsNotes(notes)
+    return this[0].containsNotes(notes) && this[0].allTonesIn(notes)
   }
 }
 

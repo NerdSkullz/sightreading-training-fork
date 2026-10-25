@@ -1,12 +1,13 @@
 # Chord Mode
 
-In addition to sight reading notes on sheet music, you can use the chord staff to sight read chords by name. Chords are generated in the desired key, and you'll need to press the minimum number of notes to continue to the next chord.
+In addition to sight reading notes on sheet music, you can use the chord staff to sight read chords by name. Chords are generated in the desired key, and you'll need to play all the notes of a chord to continue to the next one.
 
 You can access chord mode by going to **Staff**, selecting **Configure**, then **Chord** under the *Staff* option. If you want to generate chords outside a specific key you can choose **Chromatic** mode under *Key*.
 
 Here are the other configurable options:
 
-* **notes** -- The number of notes in each chord, letting you choose between triads or seven chords.
+* **extensions** -- Chords are triads by default. Tick **7th**, **9th** or **11th** to add that note on top of the triad, in any combination: **9th** on its own gives an *add9* chord like C(add9), while **7th** and **9th** together give a ninth chord like Dm7(9). Extensions come from the key, so some are altered, like Em7(b9) or FM7(#11). Without a key (**Chromatic**) the natural 9th and 11th are used.
+* **notes** -- Used by the *multi-key* generator: the number of notes in each chord, letting you choose between triads or seven chords.
 * **common notes** -- The number of notes the next chord should share with the previous chord. This can make the chords sound more connected
 
 ## Playing a chord

@@ -3,9 +3,26 @@ import {dithered, shuffled} from "st/util"
 
 import MersenneTwister from "mersennetwister"
 
+// names of the extension toggles, mapped to the chord tone they add
+export const CHORD_EXTENSIONS = {
+  "7th": 7,
+  "9th": 9,
+  "11th": 11,
+}
+
 export class ChordGenerator {
   constructor(keySignature, opts={}) {
     this.noteCount = opts.notes || 3
+
+    // tones added on top of the triad, eg. [7, 9]
+    if (opts.extensions) {
+      this.extensions = Object.keys(CHORD_EXTENSIONS)
+        .filter(name => opts.extensions[name])
+        .map(name => CHORD_EXTENSIONS[name])
+    } else {
+      this.extensions = this.noteCount >= 4 ? [7] : []
+    }
+
     this.keySignature = keySignature
     if (opts.commonNotes > 0) {
       this.commonNotes = opts.commonNotes
@@ -40,18 +57,25 @@ export class ChordGenerator {
 
   allChords() {
     if (!this.keySignature.isChromatic()) {
-      return this.scale.allChords(this.noteCount)
+      return this.scale.allExtendedChords(this.extensions)
     }
 
     let out = []
 
-    let shapes = this.noteCount == 3 ? ["M", "m"] : ["M7", "7", "m7"]
+    let shapes = this.extensions.includes(7) ? ["M7", "7", "m7"] : ["M", "m"]
+
+    // without a key, use the natural 9th and 11th
+    let tensions = []
+    if (this.extensions.includes(9)) { tensions.push(14) }
+    if (this.extensions.includes(11)) { tensions.push(17) }
+
     for (let i = 0; i < this.scale.steps.length; i++) {
       let degree = i + 1
       let root = this.scale.degreeToName(degree)
 
       shapes.forEach(s => {
-        out.push(new Chord(root, s))
+        let tones = new Chord(root, s).tones()
+        out.push(Chord.fromTones(root, [...tones, ...tensions]))
       })
     }
 

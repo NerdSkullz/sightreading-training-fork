@@ -3,6 +3,7 @@ import {
   noteStaffOffset,
   MajorScale, MinorScale, HarmonicMinorScale, AscendingMelodicMinorScale, Chord, KeySignature, ChromaticScale, Staff
 } from "st/music"
+import ChordList from "st/chord_list"
 
 describe("music", function() {
   it("less than", function() {
@@ -284,6 +285,116 @@ describe("scales", function() {
     })
 
 
+  })
+
+  describe("allExtendedChords", function() {
+    it("gets triads with no extensions", function() {
+      let scale = new MajorScale("C")
+      expect(scale.allExtendedChords([]).map(c => c.toString()))
+        .toEqual(scale.allChords(3).map(c => c.toString()))
+    })
+
+    it("gets the same chords as allChords(4) with the 7th", function() {
+      let scale = new MajorScale("C")
+      expect(scale.allExtendedChords([7])).toEqual(scale.allChords(4))
+    })
+
+    it("gets add9 chords in major scale", function() {
+      let scale = new MajorScale("C")
+      expect(scale.allExtendedChords([9]).map(c => c.toString())).toEqual([
+        "C(add9)",
+        "Dm(add9)",
+        "Em(addb9)",
+        "F(add9)",
+        "G(add9)",
+        "Am(add9)",
+        "Bdim(addb9)",
+      ])
+    })
+
+    it("gets 9 chords in major scale", function() {
+      let scale = new MajorScale("C")
+      expect(scale.allExtendedChords([7, 9]).map(c => c.toString())).toEqual([
+        "CM7(9)",
+        "Dm7(9)",
+        "Em7(b9)",
+        "FM7(9)",
+        "G7(9)",
+        "Am7(9)",
+        "Bm7b5(b9)",
+      ])
+    })
+
+    it("gets 11 chords in major scale", function() {
+      let scale = new MajorScale("C")
+      expect(scale.allExtendedChords([7, 9, 11]).map(c => c.toString())).toEqual([
+        "CM7(9,11)",
+        "Dm7(9,11)",
+        "Em7(b9,11)",
+        "FM7(9,#11)",
+        "G7(9,11)",
+        "Am7(9,11)",
+        "Bm7b5(b9,11)",
+      ])
+    })
+
+    it("gets add11 chords in major scale", function() {
+      let scale = new MajorScale("C")
+      expect(scale.allExtendedChords([11]).map(c => c.toString())).toEqual([
+        "C(add11)",
+        "Dm(add11)",
+        "Em(add11)",
+        "F(add#11)",
+        "G(add11)",
+        "Am(add11)",
+        "Bdim(add11)",
+      ])
+    })
+
+    it("names every extended chord in the minor scales", function() {
+      for (let scale of [new MinorScale("A"), new HarmonicMinorScale("A"), new AscendingMelodicMinorScale("A")]) {
+        for (let extensions of [[9], [11], [9, 11], [7, 9], [7, 11], [7, 9, 11]]) {
+          for (let chord of scale.allExtendedChords(extensions)) {
+            let tensions = chord.tones().filter(t => t > 12)
+            expect(tensions.every(t => t in Chord.TENSIONS)).toBe(true)
+            expect(chord.toString()).not.toMatch(/undefined|\?/)
+          }
+        }
+      }
+    })
+  })
+})
+
+describe("extended chords", function() {
+  it("contains the 9th and 11th in any octave", function() {
+    let chord = new MajorScale("C").buildChord(1, [7, 9, 11])
+
+    for (let note of ["C4", "E5", "G3", "B5", "D5", "D6", "F4"]) {
+      expect(chord.containsNote(note)).toBe(true)
+    }
+
+    for (let note of ["C#5", "A5", "Eb5"]) {
+      expect(chord.containsNote(note)).toBe(false)
+    }
+  })
+
+  it("leaves out the 7th when only adding the 9th", function() {
+    let chord = new MajorScale("C").buildChord(1, [9])
+    expect(chord.tones()).toEqual([0, 4, 7, 14])
+    expect(chord.containsNote("B5")).toBe(false)
+    expect(chord.containsNotes(["C5", "E5", "G5", "D6"])).toBe(true)
+  })
+
+  it("voices the extensions above the octave", function() {
+    let chord = new MajorScale("C").buildChord(1, [7, 9, 11])
+    expect(chord.getRange(5, 6)).toEqual(["C5", "E5", "G5", "B5", "D6", "F6"])
+  })
+
+  it("counts shared notes with extensions", function() {
+    let scale = new MajorScale("C")
+    let cadd9 = scale.buildChord(1, [9]) // C E G D
+    let g = scale.buildChord(5) // G B D
+    expect(cadd9.countSharedNotes(g)).toBe(2)
   })
 })
 
@@ -699,3 +810,37 @@ describe("staff", function() {
   })
 })
 
+describe("playing a chord", function() {
+  it("requires every note of a triad", function() {
+    let chords = new ChordList([new Chord("C", "M")])
+
+    expect(chords.matchesHead(["C5", "E5", "G5"])).toBe(true)
+    expect(chords.matchesHead(["E4", "G4", "C5", "E5"])).toBe(true) // any voicing
+    expect(chords.matchesHead(["C5", "E5"])).toBe(false)
+    expect(chords.matchesHead(["C5", "E5", "E6"])).toBe(false)
+    expect(chords.matchesHead(["C5", "E5", "G5", "A5"])).toBe(false) // extra note
+    expect(chords.matchesHead([])).toBe(false)
+  })
+
+  it("requires the 7th of a seventh chord", function() {
+    let chords = new ChordList([new Chord("G", "7")])
+
+    expect(chords.matchesHead(["G4", "B4", "D5"])).toBe(false)
+    expect(chords.matchesHead(["G4", "B4", "D5", "F5"])).toBe(true)
+  })
+
+  it("requires the extensions of an extended chord", function() {
+    let chords = new ChordList([new MajorScale("C").buildChord(2, [7, 9, 11])]) // Dm7(9,11)
+
+    expect(chords.matchesHead(["D4", "F4", "A4", "C5"])).toBe(false)
+    expect(chords.matchesHead(["D4", "F4", "A4", "C5", "E5"])).toBe(false)
+    expect(chords.matchesHead(["D4", "F4", "A4", "C5", "E5", "G5"])).toBe(true)
+    // the 9th and 11th can be played in any octave
+    expect(chords.matchesHead(["D3", "E3", "G3", "F4", "A4", "C5"])).toBe(true)
+  })
+
+  it("matches enharmonic spellings", function() {
+    let chords = new ChordList([new Chord("Bb", "M")])
+    expect(chords.matchesHead(["A#4", "D5", "F5"])).toBe(true)
+  })
+})

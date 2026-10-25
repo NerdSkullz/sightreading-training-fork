@@ -183,7 +183,7 @@ export default class SightReadingPage extends React.Component {
       case "chords": {
         let touched = Object.keys(this.state.touchedNotes);
 
-        if (this.state.notes.matchesHead(touched) && touched.length > 2) {
+        if (this.state.notes.matchesHead(touched)) {
           gaEvent("sight_reading", "chord", "hit");
           let notes = this.state.notes.clone()
 

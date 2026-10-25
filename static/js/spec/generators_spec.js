@@ -76,6 +76,49 @@ describe("chord generator", function() {
     ])
   })
 
+  it("gets triads by default", function() {
+    let generator = new ChordGenerator(new KeySignature(0), {extensions: {}})
+    expect(generator.allChords().map(c => c.toString())).toEqual([
+      "C", "Dm", "Em", "F", "G", "Am", "Bdim",
+    ])
+  })
+
+  it("gets seventh chords with the 7th extension or 4 notes", function() {
+    let names = ["CM7", "Dm7", "Em7", "FM7", "G7", "Am7", "Bm7b5"]
+
+    let generator = new ChordGenerator(new KeySignature(0), {extensions: {"7th": true}})
+    expect(generator.allChords().map(c => c.toString())).toEqual(names)
+
+    let legacy = new ChordGenerator(new KeySignature(0), {notes: 4})
+    expect(legacy.allChords().map(c => c.toString())).toEqual(names)
+  })
+
+  it("adds the 9th and 11th", function() {
+    let generator = new ChordGenerator(new KeySignature(0), {
+      extensions: {"9th": true, "11th": true}
+    })
+
+    expect(generator.allChords()[0].toString()).toEqual("C(add9,11)")
+
+    let full = new ChordGenerator(new KeySignature(0), {
+      extensions: {"7th": true, "9th": true, "11th": true}
+    })
+
+    expect(full.allChords()[4].toString()).toEqual("G7(9,11)")
+    for (let i = 0; i < 10; i++) {
+      expect(full.nextChord()).toBeTruthy()
+    }
+  })
+
+  it("adds natural extensions without a key", function() {
+    let generator = new ChordGenerator(new ChromaticKeySignature(), {
+      extensions: {"7th": true, "9th": true}
+    })
+
+    let names = generator.allChords().map(c => c.toString())
+    expect(names.slice(0, 3)).toEqual(["CM7(9)", "C7(9)", "Cm7(9)"])
+  })
+
   it("generates some chords without an error", function() {
     let generator = new ChordGenerator(new KeySignature(0))
     for (let i = 0; i < 10; i++) {

@@ -287,7 +287,9 @@
     .chord {
         font-size: 30px;
         font-weight: bold;
-        width: 160px;
+        min-width: 160px;
+        box-sizing: border-box;
+        padding-right: 30px;
         display: inline-flex;
         align-items: center;
     }

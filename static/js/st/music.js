@@ -560,6 +560,35 @@ export class Scale {
   }
 
 
+  // chord on degree made by stacking thirds, extensions lists the tones to
+  // add on top of the triad: eg. [7, 9] adds the 7th and 9th
+  buildChord(degree, extensions=[]) {
+    let chordTones = [3, 5, 7, 9, 11]
+    let thirds = this.buildChordSteps(degree, chordTones.length)
+    let intervals = []
+    let gap = 0
+
+    chordTones.forEach((tone, i) => {
+      gap += thirds[i]
+      if (tone <= 5 || extensions.includes(tone)) {
+        intervals.push(gap)
+        gap = 0
+      }
+    })
+
+    return new Chord(this.degreeToName(degree), intervals)
+  }
+
+  // all chords with the triad plus extensions, see buildChord
+  allExtendedChords(extensions=[]) {
+    let out = []
+    for (let i = 0; i < this.steps.length; i++) {
+      out.push(this.buildChord(i + 1, extensions))
+    }
+
+    return out
+  }
+
   // all chords with count notes
   allChords(noteCount=3) {
     let out = []
@@ -658,6 +687,26 @@ export class Chord extends Scale {
     "Qb4": [4, 5],
   }
 
+  // names of tones above the octave, by semitones from the root
+  static TENSIONS = {
+    13: "b9",
+    14: "9",
+    15: "#9",
+    16: "b11",
+    17: "11",
+    18: "#11",
+  }
+
+  // Chord.fromTones("C", [0, 4, 7, 14]) -> C(add9)
+  static fromTones(root, tones) {
+    let intervals = []
+    for (let i = 1; i < tones.length; i++) {
+      intervals.push(tones[i] - tones[i - 1])
+    }
+
+    return new Chord(root, intervals)
+  }
+
   // Chord.notes("C5", "M", 1) -> first inversion C major chord
   static notes(note, chordName, inversion=0, notesCount=0) {
     let [, root, octave] = note.match(/^([^\d]+)(\d+)$/);
@@ -697,6 +746,27 @@ export class Chord extends Scale {
     }
 
     this.steps.push(rest)
+  }
+
+  // semitones from the root to each chord tone, eg. [0, 4, 7, 14] for C(add9)
+  tones() {
+    let out = [0]
+    let sum = 0
+    // the last step only wraps back around to the root
+    for (let i = 0; i < this.steps.length - 1; i++) {
+      sum += this.steps[i]
+      out.push(sum)
+    }
+
+    return out
+  }
+
+  // compare by pitch class, since extensions can be above the octave
+  containsNote(note) {
+    let pitch = parseNoteOffset(note) - parseNoteOffset(this.root)
+    pitch = (pitch % OCTAVE_SIZE + OCTAVE_SIZE) % OCTAVE_SIZE
+
+    return this.tones().some(tone => tone % OCTAVE_SIZE == pitch)
   }
 
   // is major or dom7 chord
@@ -768,6 +838,16 @@ export class Chord extends Scale {
     return true
   }
 
+  // are all of the chord's tones in notes, in any octave
+  allTonesIn(notes) {
+    let rootPitch = parseNoteOffset(this.root)
+    let played = new Set(notes.map(note =>
+      (parseNoteOffset(note) - rootPitch + OCTAVE_SIZE) % OCTAVE_SIZE
+    ))
+
+    return this.tones().every(tone => played.has(tone % OCTAVE_SIZE))
+  }
+
   // how many notes do the two chords share
   countSharedNotes(otherChord) {
     let myNotes = this.getRange(5, this.steps.length)
@@ -794,6 +874,22 @@ export class Chord extends Scale {
   }
 
   toString() {
+    let tones = this.tones()
+    let tensions = tones.filter(t => t > OCTAVE_SIZE)
+
+    if (tensions.length) {
+      // name the triad or seventh chord, then list the extensions
+      let base = Chord.fromTones(this.root, tones.filter(t => t < OCTAVE_SIZE))
+      let baseName = base.toString()
+      let tensionNames = tensions.map(t => Chord.TENSIONS[t] || "?").join(",")
+
+      if (base.tones().length > 3) {
+        return `${baseName}(${tensionNames})`
+      } else {
+        return `${baseName}(add${tensionNames})`
+      }
+    }
+
     let name = this.chordShapeName()
     if (!name) {
       console.warn("don't know name of chord", this.root, this.steps, this.getRange(5, 3))

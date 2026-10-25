@@ -339,16 +339,15 @@ export class GeneratorSettings extends React.PureComponent {
   renderToggles(input, idx) {
     let currentValue = this.cachedSettings[input.name] || {}
 
-    return <div className="toggles">
+    return <div className={styles.toggles}>
       {input.options.map(subName =>
-        <label className="toggle" key={subName}>
+        <label key={subName}>
           <input
             onChange={e => 
               this.updateInputValue(input, {...currentValue, [subName]: e.target.checked})
             }
             checked={currentValue[subName] || false}
             type="checkbox" />
-          {" "}
           {subName}
         </label>
       )}
