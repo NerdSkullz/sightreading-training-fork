@@ -5,10 +5,10 @@
   "manifest_version": 2,
   "app": {
     "urls": [
-      "https://sightreading.training/"
+      "https://nerdskullz.github.io/sightreading-training-fork/"
     ],
     "launch": {
-      "web_url": "https://sightreading.training"
+      "web_url": "https://nerdskullz.github.io/sightreading-training-fork/"
     }
   },
   "icons": {

@@ -1,14 +1,18 @@
 # Sight Reading Trainer
 
-## <https://sightreading.training>
+## <https://nerdskullz.github.io/sightreading-training-fork/>
 
-![test](https://github.com/leafo/sightreading.training/workflows/test/badge.svg)
+![build and deploy](https://github.com/NerdSkullz/sightreading-training-fork/actions/workflows/pages.yml/badge.svg)
 
 [![Twitch Link](http://leafo.net/dump/twitch-banner.svg)](https://www.twitch.tv/moonscript)
 
 A tool for practicing sight reading, learning songs, and training other musical skills in your browser. The successor to <https://github.com/leafo/mursic>.
 
-Learn more on [the guide](https://sightreading.training/about).
+Learn more on [the guide](https://nerdskullz.github.io/sightreading-training-fork/about).
+
+This is a frontend-only fork of
+[leafo/sightreading.training](https://github.com/leafo/sightreading.training),
+with the backend removed so it can be hosted as a static site.
 
 ![screenshot](http://leafo.net/shotsnb/2016-05-14_16-30-55.png)
 
