@@ -9,10 +9,6 @@ import styles from "st/components/settings_panel.module.css"
 import {KeySignature, ChromaticKeySignature, noteName, parseNote} from "st/music"
 import * as types from "prop-types"
 
-import {ENABLE_PRESETS} from "st/globals"
-
-import {getSession} from "st/app"
-
 export class SettingsPanel extends React.PureComponent {
   static propTypes = {
     close: types.func.isRequired,
@@ -27,20 +23,12 @@ export class SettingsPanel extends React.PureComponent {
     this.state = {}
   }
 
-  componentDidMount() {
-    if (ENABLE_PRESETS) {
-      this.loadPresets()
-    }
-  }
-
   render() {
     return <section className={styles.settings_panel}>
       <div className={styles.settings_header}>
         <h3>Settings</h3>
         <button onClick={this.props.close}>Close</button>
       </div>
-
-      {this.renderPresets()}
 
       <section className={styles.settings_group}>
         <h4>Staff</h4>
@@ -59,71 +47,6 @@ export class SettingsPanel extends React.PureComponent {
         {this.renderKeys()}
       </section>
     </section>
-  }
-
-  savePreset(e) {
-    e.preventDefault()
-    trigger(this, "saveGeneratorPreset", this.refs.presetForm)
-  }
-
-  loadPresets() {
-    const session = getSession()
-    if (!session.currentUser) { return }
-
-    this.setState({
-      loadingPresets: true
-    })
-
-    let request = new XMLHttpRequest()
-    request.open("GET", "/presets.json")
-    request.send()
-    request.onload = (e) => {
-      try {
-        let res = JSON.parse(request.responseText)
-        this.setState({
-          loadingPresets: false,
-          presets: res.presets
-        })
-      } catch (e) {
-        this.setState({loadingPresets: false})
-      }
-    }
-
-  }
-
-  renderPresets() {
-    if (!ENABLE_PRESETS) { return }
-
-    const session = getSession()
-
-    if (!session.currentUser) { return }
-
-    var presetsPicker
-
-    if (this.state.presets && this.state.presets.length) {
-      presetsPicker = <div className="presetsPicker">
-        <Select
-          className={styles.select_component}
-          name="preset"
-          options={this.state.presets.map(p => ({
-              name: p.name,
-              value: p.name
-            }))
-          }
-        />
-      </div>
-    }
-
-    return <div className={styles.settings_group}>
-      {presetsPicker}
-      <form onSubmit={this.savePreset.bind(this)} ref="presetForm">
-        <label>
-          Name
-          <input type="text" name="name" />
-        </label>
-        <button disabled={this.props.savePreset || false}>Save preset</button>
-      </form>
-    </div>
   }
 
   renderStaves() {

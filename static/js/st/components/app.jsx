@@ -1,14 +1,10 @@
 import SightReadingPage from "st/components/pages/sight_reading_page"
-import LoginPage from "st/components/pages/login_page"
-import RegisterPage from "st/components/pages/register_page"
 import {guideRoutes} from "st/components/pages/guide_pages"
-import StatsPage from "st/components/pages/stats"
 import FlashCardPage from "st/components/pages/flash_card_page"
 import EarTrainingPage from "st/components/pages/ear_training_page"
-import {PlayAlongPageWithParams as PlayAlongPage} from "st/components/pages/play_along_page"
+import PlayAlongPage from "st/components/pages/play_along_page"
 import LatencyPage from "st/components/pages/latency"
 import MidiMonitorPage from "st/components/pages/midi_monitor"
-import SongsPage from "st/components/pages/songs"
 import NotFoundPage from "st/components/pages/not_found"
 import Header from "st/components/header"
 
@@ -16,14 +12,11 @@ import DevicePickerLightbox from "st/components/device_picker_lightbox"
 
 import {dispatch, trigger} from "st/events"
 import {readConfig, writeConfig} from "st/config"
-import {csrfToken} from "st/globals"
 
 import * as React from "react"
 import {BrowserRouter, Route, Routes, Navigate} from "react-router-dom"
 
 import {SampleOutput} from "st/sample_output"
-
-import {init as initApp} from "st/app"
 
 class Layout extends React.Component {
   constructor(props) {
@@ -118,8 +111,6 @@ class Layout extends React.Component {
       <Routes>
         <Route path="/" element={<SightReadingPage {...pageProps} />} />
         <Route path="/staff2" element={<SightReadingPage useStaffTwo={true} {...pageProps} />} />
-        <Route path="/login" element={<LoginPage/>} />
-        <Route path="/register" element={<RegisterPage/>} />
 
         <Route path="/ear-training">
           <Route path="interval-melodies" element={<EarTrainingPage exercise="melody_recognition" {...pageProps} />} />
@@ -134,18 +125,11 @@ class Layout extends React.Component {
           <Route index element={<Navigate replace to="/flash-cards/note-math" />} />
         </Route>
 
-        <Route path="/play-along">
-          <Route index element={<SongsPage {...pageProps} />} />
-          <Route path="recent" element={<SongsPage filter="recent" {...pageProps} />} />
-          <Route path="*" element={<SongsPage filter="invalid" {...pageProps} />} />
-        </Route>
+        <Route path="/play-along" element={<PlayAlongPage editorOpen={true} {...pageProps} />} />
 
-        <Route path="/stats" element={<StatsPage {...pageProps} />} />
         <Route path="/latency" element={<LatencyPage {...pageProps} />} />
         <Route path="/midi-monitor" element={<MidiMonitorPage {...pageProps} />} />
-        <Route path="/new-song" element={<PlayAlongPage newSong={true} editorOpen={true} {...pageProps} />} />
-
-        <Route path="/song/:song_id/:song_slug" element={<PlayAlongPage {...pageProps} />} />
+        <Route path="/new-song" element={<Navigate replace to="/play-along" />} />
 
         {guideRoutes()}
 
@@ -167,23 +151,9 @@ class Layout extends React.Component {
     return lb
   }
 
-  doLogout() {
-    let request = new XMLHttpRequest()
-    request.open("POST", "/logout.json")
-    let data = new FormData()
-    data.append("csrf_token", csrfToken())
-    request.send(data)
-
-    request.onload = (e) => {
-      let res = JSON.parse(request.responseText)
-      initApp(res)
-    }
-  }
-
   renderHeader() {
     return <Header
       midiInput={this.state.midiInput}
-      doLogout={this.doLogout.bind(this)}
       />
   }
 

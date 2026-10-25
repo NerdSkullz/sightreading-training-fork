@@ -1,7 +1,7 @@
-// Generates the frontend assets normally produced by tup, so the frontend
-// can be developed without the backend toolchain (tup, moonscript, lua).
-// Files are only written when missing or older than their sources, so a
-// tup-managed checkout is left alone.
+// Generates source files that the app imports or fetches at runtime: the song
+// parser, the inlined staff SVGs, and the guide pages. Files are only written
+// when missing or older than their sources. Run automatically by the dev
+// server and the production build.
 
 import {readFileSync, writeFileSync, readdirSync, statSync, existsSync} from "fs"
 import {join, dirname, basename} from "path"
@@ -52,8 +52,6 @@ export function buildAssets() {
   }
 
   // guide pages: static/guides/*.md -> *.json
-  // (tup uses the lua discount renderer; marked output differs slightly but is
-  // equivalent for dev purposes)
   const guidesDir = join(ROOT, "static/guides")
   for (const md of readdirSync(guidesDir).filter(f => f.endsWith(".md"))) {
     const source = join(guidesDir, md)

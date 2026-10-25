@@ -1,11 +1,4 @@
-/*global ga, ST_FRONTEND_ONLY*/
-
-export const ENABLE_PRESETS = false
-export const ENABLE_SERVICE_WORKER = false
-
-// true when built by the frontend-only dev server (dev/serve.mjs), which has
-// no backend to serve API requests
-export const FRONTEND_ONLY = typeof ST_FRONTEND_ONLY !== "undefined" && ST_FRONTEND_ONLY
+/*global ga*/
 
 export function setTitle(title) {
   if (title) {
@@ -13,10 +6,6 @@ export function setTitle(title) {
   } else {
     document.title = "Sight Reading Trainer"
   }
-}
-
-export function csrfToken() {
-  return document.getElementById("csrf_token").getAttribute("content")
 }
 
 export function gaEvent(category, action, label, value, interactive=true) {

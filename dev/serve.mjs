@@ -1,8 +1,10 @@
-// Frontend-only dev server: bundles and serves the app with esbuild, no
-// backend required. Backend features (login, stats, play-along song library)
-// will 404; everything else works.
+// Development server: bundles and serves the app with esbuild, rebuilding on
+// changes and reloading the page.
 //
 //   npm run dev
+//
+// The app is at http://localhost:3000/ and the browser specs are at
+// http://localhost:3000/dev/specs.html
 
 import {join, dirname} from "path"
 import {fileURLToPath} from "url"
@@ -18,16 +20,16 @@ if (generated.length) {
   console.log(`generated ${generated.length} asset file(s)`)
 }
 
-// bundle to dev/out rather than static/ so the tup-managed main.js on a
-// full checkout is never overwritten by the frontend-only workflow
 const ctx = await esbuild.context({
-  entryPoints: ["static/js/st/main.jsx"],
+  entryPoints: {
+    main: "static/js/st/main.jsx",
+    specs: "static/js/specs.js",
+  },
   bundle: true,
   sourcemap: true,
-  outfile: "dev/out/main.js",
+  outdir: "dev/out",
   nodePaths: ["static/js"],
   external: ["/static/fonts/*"],
-  define: {ST_FRONTEND_ONLY: "true"},
   logLevel: "info",
 })
 
@@ -39,4 +41,5 @@ const {port} = await ctx.serve({
   port: 3000,
 })
 
-console.log(`\nSight Reading Trainer (frontend only): http://localhost:${port}/`)
+console.log(`\nSight Reading Trainer: http://localhost:${port}/`)
+console.log(`Specs: http://localhost:${port}/dev/specs.html`)

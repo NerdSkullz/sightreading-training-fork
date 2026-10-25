@@ -22,7 +22,7 @@
         gap: 20px;
         color: #666;
 
-        > a, > .right_section {
+        > a {
             white-space: nowrap;
         }
     }
@@ -80,35 +80,6 @@
             }
         }
 
-        .account_area {
-            border-bottom: 1px solid color-mix(in oklab, var(--border-color), white 20%);
-            display: flex;
-            padding: 8px 10px;
-            align-items: center;
-
-            &.logged_in {
-                > :first-child {
-                    flex: 1;
-                }
-
-                .username {
-                    min-width: 0;
-                    white-space: nowrap;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                }
-            }
-
-            &.logged_out {
-                > * {
-                    flex: 1;
-                    &:last-child {
-                        text-align: right;
-                    }
-                }
-            }
-        }
-
         ul {
             list-style: none;
             padding: 0;
@@ -122,11 +93,6 @@
                 }
             }
         }
-    }
-
-    .right_section {
-        text-align: right;
-        flex: 1;
     }
 
     .logo, .logo_small {

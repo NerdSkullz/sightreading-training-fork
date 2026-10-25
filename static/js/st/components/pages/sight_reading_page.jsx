@@ -15,8 +15,8 @@ import sharedStyles from "st/components/shared.module.css"
 import {KeySignature, noteName, parseNote} from "st/music"
 import {STAVES, GENERATORS} from "st/data"
 import {GeneratorSettings, SettingsPanel} from "st/components/sight_reading/settings_panel"
-import {setTitle, gaEvent, csrfToken} from "st/globals"
-import {dispatch, trigger} from "st/events"
+import {setTitle, gaEvent} from "st/globals"
+import {trigger} from "st/events"
 import {NOTE_EVENTS} from "st/midi"
 import {generatorDefaultSettings} from "st/generators"
 
@@ -30,7 +30,6 @@ import * as types from "prop-types"
 
 import {TransitionGroup, CSSTransition} from "react-transition-group"
 
-import {getSession} from "st/app"
 
 import {StaffTwo} from "st/components/staff_two"
 
@@ -48,8 +47,6 @@ export default class SightReadingPage extends React.Component {
     this.keyMap = {
       " ": e => this.skipCurrentNote(),
     }
-
-    const session = getSession()
 
     this.state = {
       newRenderer: props.useStaffTwo || false,
@@ -71,7 +68,7 @@ export default class SightReadingPage extends React.Component {
       keyboardOpen: true,
       settingsOpen: false,
       scale: window.innerWidth < 1000 ? 0.8 : 1,
-      stats: new NoteStats(session.currentUser),
+      stats: new NoteStats(),
       keySignature: new KeySignature(0),
     }
   }
@@ -93,34 +90,6 @@ export default class SightReadingPage extends React.Component {
 
     this.setStaff(STAVES[0], () => {
       this.enterWaitMode()
-    })
-
-    dispatch(this, {
-      saveGeneratorPreset: (e, form) => {
-        if (this.state.savingPreset) {
-          return;
-        }
-
-        let preset = JSON.stringify({
-          type: "notes",
-          name: this.state.currentGenerator.name,
-          settings: this.state.currentGeneratorSettings,
-        })
-
-        this.setState({savingPreset: true})
-
-        let request = new XMLHttpRequest()
-        request.open("POST", "/new-preset.json")
-        let data = new FormData(form)
-        data.append("csrf_token", csrfToken())
-        data.append("preset", preset)
-        request.send(data)
-
-        request.onload = (e) => {
-          let res = JSON.parse(request.responseText)
-          this.setState({savingPreset: false})
-        }
-      }
     })
 
     document.addEventListener("webkitfullscreenchange", this.onFullscreenChange)
@@ -564,7 +533,6 @@ export default class SightReadingPage extends React.Component {
         close={this._toggleSettings ||= this.toggleSettings.bind(this)}
         staves={STAVES}
         generators={GENERATORS}
-        saveGeneratorPreset={this.state.savingPreset}
 
         currentGenerator={this.state.currentGenerator}
         currentGeneratorSettings={this.state.currentGeneratorSettings}

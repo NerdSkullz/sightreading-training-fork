@@ -1,3 +1,0 @@
-.gitignore
-
-: foreach *.md |> moon convert_to_json.moon %f > %o |> %B.json

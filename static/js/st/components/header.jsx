@@ -1,6 +1,5 @@
 import * as React from "react"
 import * as ReactDOM from "react-dom"
-import classNames from "classnames"
 import {Link, NavLink} from "react-router-dom"
 
 import {trigger} from "st/events"
@@ -8,8 +7,6 @@ import MidiButton from "st/components/midi_button"
 import {IconDownArrow} from "st/components/icons"
 
 import Lightbox from "st/components/lightbox"
-
-import {getSession} from "st/app"
 
 import {toggleActive} from "st/components/util"
 
@@ -82,23 +79,6 @@ export default class Header extends React.Component {
 
 
     if (this.state.menuOpen) {
-      let accountArea = null
-      const session = getSession()
-
-      if (session.currentUser) {
-        accountArea = <div className={classNames(styles.account_area, styles.logged_in)}>
-          <span className={styles.username}>
-            {session.currentUser.username}
-          </span>
-          <a href="#" onClick={this.props.doLogout}>Log out</a>
-        </div>
-      } else {
-        accountArea = <div className={classNames(styles.account_area, styles.logged_out)}>
-          <NavLink to="/login" {...toggleActive}>Log in</NavLink>
-          <NavLink to="/register" {...toggleActive}>Register</NavLink>
-        </div>
-      }
-
       menu = <Lightbox
         key="navigation_menu"
         className={styles.navigation_menu}
@@ -111,7 +91,6 @@ export default class Header extends React.Component {
           this.setState({ menuOpen: false })
         }}
       >
-        {accountArea}
         {showMidiButton ? <div className={styles.midi_button_wrapper}>{this.renderMidiButton()}</div> : null}
         <ul>
           {userLinks.map((link, i) => <li key={i}>{link}</li>)}
@@ -131,48 +110,17 @@ export default class Header extends React.Component {
   }
 
   renderHorizontalNavigation() {
-    let userPanel = null
-    let userLinks = this.getPageLinks()
-
-    const session = getSession()
-
-    if (session.currentUser) {
-      userPanel = <div className={styles.right_section} key="user_in">
-        {session.currentUser.username}
-        {" " }
-        <a href="#" onClick={this.props.doLogout}>Log out</a>
-      </div>
-
-    } else {
-      userPanel = <div className={styles.right_section} key="user_out">
-        <NavLink to="/login" {...toggleActive}>Log in</NavLink>
-        {" or "}
-        <NavLink to="/register" {...toggleActive}>Register</NavLink>
-      </div>
-    }
-
-    return [
-      ...userLinks,
-      userPanel,
-    ]
+    return this.getPageLinks()
   }
 
   getPageLinks() {
-    let links = [
+    return [
       <NavLink end key="root" to="/" {...toggleActive}>Staff</NavLink>,
       <NavLink end key="ear-training" to="/ear-training/interval-melodies" {...toggleActive}>Ear Training</NavLink>,
       <NavLink end key="flash-cards" to="/flash-cards/note-math" {...toggleActive}>Flash Cards</NavLink>,
       <NavLink key="play-along" to="/play-along" {...toggleActive}>Play Along</NavLink>,
       <NavLink end key="about" to="/about" {...toggleActive}>Guide</NavLink>,
     ]
-
-    const session = getSession()
-
-    if (session.currentUser) {
-      links.push(<NavLink end key="stats" to="/stats" {...toggleActive}>Stats</NavLink>)
-    }
-
-    return links
   }
 
   renderMidiButton() {
@@ -184,7 +132,6 @@ export default class Header extends React.Component {
   }
 
   render() {
-    let userPanel = null
     let enableDropdown = this.state.width && this.state.width < 700
     let hideMidiButton = !this.state.width || this.state.width < 450
 
