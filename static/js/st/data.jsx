@@ -295,6 +295,7 @@ export const GENERATORS = [
           { name: "natural minor" },
           { name: "harmonic minor"},
           { name: "melodic minor"},
+          { name: "blues" },
         ]
       },
       {

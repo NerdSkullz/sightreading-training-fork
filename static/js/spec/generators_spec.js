@@ -127,6 +127,57 @@ describe("chord generator", function() {
     }
   })
 
+  describe("blues", function() {
+    let blues = (key, extensions={}) =>
+      new ChordGenerator(new KeySignature(key), {scale: "blues", extensions})
+        .allChords().map(c => c.toString())
+
+    it("gets the I, IV and V chords", function() {
+      expect(blues(0)).toEqual(["C", "F", "G"])
+      expect(blues(-3)).toEqual(["Eb", "Ab", "Bb"])
+    })
+
+    it("makes them all dominant", function() {
+      expect(blues(0, {"7th": true})).toEqual(["C7", "F7", "G7"])
+      expect(blues(2, {"7th": true})).toEqual(["D7", "G7", "A7"])
+      expect(blues(0, {"7th": true, "9th": true, "11th": true})).toEqual([
+        "C7(9,11)", "F7(9,11)", "G7(9,11)",
+      ])
+    })
+
+    it("generates chords with common notes", function() {
+      let generator = new ChordGenerator(new KeySignature(0), {
+        scale: "blues",
+        commonNotes: 2,
+      })
+
+      for (let i = 0; i < 20; i++) {
+        expect(["C", "F", "G"]).toContain(generator.nextChord().toString())
+      }
+    })
+
+    it("follows V with I in a ii-V-I", function() {
+      let generator = new ChordGenerator(new KeySignature(0), {
+        scale: "blues",
+        chordProgression: "ii-V-I",
+        extensions: {"7th": true},
+      })
+
+      let names = []
+      for (let i = 0; i < 100; i++) {
+        names.push(generator.nextChord().toString())
+      }
+
+      for (let i = 0; i < names.length - 1; i++) {
+        if (names[i] == "G7") {
+          expect(names[i + 1]).toEqual("C7")
+        }
+      }
+
+      expect(names).toContain("F7")
+    })
+  })
+
   describe("chord progressions", function() {
     let generate = (opts, count=200) => {
       let generator = new ChordGenerator(new KeySignature(0), opts)

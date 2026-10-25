@@ -1,4 +1,4 @@
-import {Chord, MajorScale, MinorScale, MajorBluesScale, HarmonicMinorScale, AscendingMelodicMinorScale, KeySignature} from "st/music"
+import {Chord, MajorScale, MinorScale, MajorBluesScale, HarmonicMinorScale, AscendingMelodicMinorScale, MixolydianScale, KeySignature} from "st/music"
 import {dithered, shuffled} from "st/util"
 
 import MersenneTwister from "mersennetwister"
@@ -17,6 +17,11 @@ export const CHORD_EXTENSIONS = {
 export const CHORD_PROGRESSIONS = {
   "ii-V-I": [2, 5, 1],
 }
+
+// the blues scale is played over the dominant chords on I, IV and V of the
+// key, eg. C7 F7 G7 in C. Stacking thirds on the scale itself doesn't give
+// blues chords
+const BLUES_DEGREES = [1, 4, 5]
 
 export class ChordGenerator {
   constructor(keySignature, opts={}) {
@@ -60,6 +65,10 @@ export class ChordGenerator {
         case "melodic minor":
           this.scale = new AscendingMelodicMinorScale(keySignature.name())
           break
+        case "blues":
+          this.scale = new MajorScale(keySignature.name())
+          this.blues = true
+          break
         case "major blues":
           this.scale = new MajorBluesScale(keySignature.name())
           break
@@ -71,6 +80,15 @@ export class ChordGenerator {
 
   allChords() {
     if (!this.keySignature.isChromatic()) {
+      if (this.blues) {
+        // build each chord from its own mixolydian so it's dominant, with
+        // the natural 9th and 11th
+        return BLUES_DEGREES.map(degree =>
+          new MixolydianScale(this.scale.degreeToName(degree))
+            .buildChord(1, this.extensions)
+        )
+      }
+
       return this.scale.allExtendedChords(this.extensions)
     }
 
@@ -96,37 +114,48 @@ export class ChordGenerator {
     return out
   }
 
+  // the scale degree each chord from allChords is built on
+  chordDegrees() {
+    if (this.blues) {
+      return BLUES_DEGREES
+    }
+
+    return this.scale.steps.map((step, i) => i + 1)
+  }
 
   nextChord() {
     if (!this.chords) {
       this.chords = this.allChords()
+      this.degrees = this.chordDegrees()
       this.chordOccurrences = new Map
     }
 
     // carry on with the progression the last chord is part of. This takes
-    // priority over common notes
+    // priority over common notes. Degrees the scale has no chord for are
+    // skipped, eg. there's no ii in the blues
     let step = this.progressionStep
     if (step != null && step + 1 < this.progression.length) {
-      this.progressionStep = step + 1
-      // chords are in scale degree order
-      return this.pickChord(this.chords[this.progression[step + 1] - 1])
+      let idx = this.degrees.indexOf(this.progression[step + 1])
+      if (idx >= 0) {
+        this.progressionStep = step + 1
+        return this.pickChord(this.chords[idx])
+      }
     }
 
-    let availableChords = []
-    this.chords.forEach(chord => {
-      if (this.lastChord && (this.lastChord.toString() == chord.toString())) {
-        return
-      }
+    let availableChords = this.chords.filter(chord =>
+      !this.lastChord || this.lastChord.toString() != chord.toString()
+    )
 
-      if (this.commonNotes && this.lastChord) {
-        let common = this.lastChord.countSharedNotes(chord)
-        if (common < this.commonNotes) {
-          return
-        }
-      }
+    if (this.commonNotes && this.lastChord) {
+      let sharing = availableChords.filter(chord =>
+        this.lastChord.countSharedNotes(chord) >= this.commonNotes
+      )
 
-      availableChords.push(chord)
-    })
+      // with few chords, eg. the blues, there might not be any
+      if (sharing.length) {
+        availableChords = sharing
+      }
+    }
 
     let groupedByOccurence = {}
     availableChords.forEach(chord => {
@@ -146,7 +175,7 @@ export class ChordGenerator {
 
     if (this.progression) {
       // a random chord can start a progression, or join one part way through
-      let step = this.progression.indexOf(this.chords.indexOf(chord) + 1)
+      let step = this.progression.indexOf(this.degrees[this.chords.indexOf(chord)])
       this.progressionStep = step >= 0 ? step : null
     }
 
