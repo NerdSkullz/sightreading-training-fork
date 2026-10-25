@@ -10,6 +10,14 @@ export const CHORD_EXTENSIONS = {
   "11th": 11,
 }
 
+// names of the progression options, mapped to the scale degrees they step
+// through. Whenever one of these chords comes up, the rest of the progression
+// follows it, eg. for ii-V-I a ii is always followed by V then I, and a V is
+// always followed by I. "random" isn't listed: it has no progression
+export const CHORD_PROGRESSIONS = {
+  "ii-V-I": [2, 5, 1],
+}
+
 export class ChordGenerator {
   constructor(keySignature, opts={}) {
     this.noteCount = opts.notes || 3
@@ -26,6 +34,12 @@ export class ChordGenerator {
     this.keySignature = keySignature
     if (opts.commonNotes > 0) {
       this.commonNotes = opts.commonNotes
+    }
+
+    // chromatic chords aren't built on scale degrees, so progressions only
+    // apply to keys
+    if (CHORD_PROGRESSIONS[opts.chordProgression] && !keySignature.isChromatic()) {
+      this.progression = CHORD_PROGRESSIONS[opts.chordProgression]
     }
 
     this.generator = new MersenneTwister()
@@ -89,6 +103,15 @@ export class ChordGenerator {
       this.chordOccurrences = new Map
     }
 
+    // carry on with the progression the last chord is part of. This takes
+    // priority over common notes
+    let step = this.progressionStep
+    if (step != null && step + 1 < this.progression.length) {
+      this.progressionStep = step + 1
+      // chords are in scale degree order
+      return this.pickChord(this.chords[this.progression[step + 1] - 1])
+    }
+
     let availableChords = []
     this.chords.forEach(chord => {
       if (this.lastChord && (this.lastChord.toString() == chord.toString())) {
@@ -119,10 +142,21 @@ export class ChordGenerator {
     chordGroups.sort((a,b) => a[0] - b[0])
     availableChords = chordGroups.reduce((list, group) => list.concat(group[1]), [])
 
-    this.lastChord = dithered(availableChords, 3, this.generator)[0]
-    this.chordOccurrences.set(this.lastChord.toString(), (this.chordOccurrences.get(this.lastChord.toString()) || 0) + 1)
+    let chord = dithered(availableChords, 3, this.generator)[0]
 
-    return this.lastChord
+    if (this.progression) {
+      // a random chord can start a progression, or join one part way through
+      let step = this.progression.indexOf(this.chords.indexOf(chord) + 1)
+      this.progressionStep = step >= 0 ? step : null
+    }
+
+    return this.pickChord(chord)
+  }
+
+  pickChord(chord) {
+    this.lastChord = chord
+    this.chordOccurrences.set(chord.toString(), (this.chordOccurrences.get(chord.toString()) || 0) + 1)
+    return chord
   }
 }
 

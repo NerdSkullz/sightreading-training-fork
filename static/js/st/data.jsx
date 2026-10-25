@@ -8,7 +8,7 @@ import {
   ProgressionGenerator, PositionGenerator, IntervalGenerator
 } from "st/generators"
 
-import {ChordGenerator, MultiKeyChordGenerator, CHORD_EXTENSIONS} from "st/chord_generators"
+import {ChordGenerator, MultiKeyChordGenerator, CHORD_EXTENSIONS, CHORD_PROGRESSIONS} from "st/chord_generators"
 import {GStaff, FStaff, GrandStaff, ChordStaff} from "st/components/staves"
 
 let smoothInput = {
@@ -302,6 +302,17 @@ export const GENERATORS = [
         name: "extensions",
         type: "toggles",
         options: Object.keys(CHORD_EXTENSIONS),
+      },
+      {
+        // random picks any chord, a progression also makes its chords
+        // follow each other
+        name: "chordProgression",
+        label: "chord progression",
+        type: "select",
+        values: [
+          { name: "random" },
+          ...Object.keys(CHORD_PROGRESSIONS).map(name => ({ name })),
+        ]
       },
       {
         name: "ignoreAbove",

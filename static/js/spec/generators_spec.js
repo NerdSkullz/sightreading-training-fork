@@ -127,6 +127,56 @@ describe("chord generator", function() {
     }
   })
 
+  describe("chord progressions", function() {
+    let generate = (opts, count=200) => {
+      let generator = new ChordGenerator(new KeySignature(0), opts)
+      let names = []
+      for (let i = 0; i < count; i++) {
+        names.push(generator.nextChord().toString())
+      }
+      return names
+    }
+
+    it("follows ii with V then I, and V with I", function() {
+      let names = generate({chordProgression: "ii-V-I"})
+
+      // the last chords may have been cut off mid progression
+      for (let i = 0; i < names.length - 2; i++) {
+        if (names[i] == "Dm") {
+          expect(names.slice(i, i + 3)).toEqual(["Dm", "G", "C"])
+        }
+
+        if (names[i] == "G") {
+          expect(names[i + 1]).toEqual("C")
+        }
+      }
+
+      // the rest of the chords still come up
+      expect(names).toContain("Em")
+      expect(names).toContain("Am")
+    })
+
+    it("follows the progression with extensions and common notes", function() {
+      let names = generate({
+        chordProgression: "ii-V-I",
+        extensions: {"7th": true},
+        commonNotes: 2,
+      })
+
+      for (let i = 0; i < names.length - 2; i++) {
+        if (names[i] == "Dm7") {
+          expect(names.slice(i, i + 3)).toEqual(["Dm7", "G7", "CM7"])
+        }
+      }
+    })
+
+    it("lets V go anywhere when random", function() {
+      let names = generate({chordProgression: "random"})
+      let afterV = names.filter((name, i) => i > 0 && names[i - 1] == "G")
+      expect(afterV.some(name => name != "C")).toBe(true)
+    })
+  })
+
   describe("multi key chord generator", function() {
     it("should create generator", function() {
       let generator = new MultiKeyChordGenerator(new KeySignature(0))
