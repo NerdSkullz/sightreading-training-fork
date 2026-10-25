@@ -39,12 +39,12 @@ export default class MelodyRecognitionExercise extends React.Component {
     }, {
       interval: "M2",
       direction: "asc",
-      song: "M2_asc",
+      song: "maj2_asc",
       title: "Silent Night"
     }, {
       interval: "M2",
       direction: "desc",
-      song: "M2_desc",
+      song: "maj2_desc",
       title: "Mary Had A Little Lamb"
     }, {
       interval: "m3",
@@ -59,12 +59,12 @@ export default class MelodyRecognitionExercise extends React.Component {
     }, {
       interval: "M3",
       direction: "asc",
-      song: "M3_asc",
+      song: "maj3_asc",
       title: "On When The Saints",
     }, {
       interval: "M3",
       direction: "desc",
-      song: "M3_desc",
+      song: "maj3_desc",
       title: "Swing Low Sweet Chariot",
     }, {
       interval: "P4",
@@ -99,7 +99,7 @@ export default class MelodyRecognitionExercise extends React.Component {
     }, {
       interval: "M6",
       direction: "asc",
-      song: "M6_asc",
+      song: "maj6_asc",
       title: "NBC",
     }, {
       interval: "m7",
@@ -109,7 +109,7 @@ export default class MelodyRecognitionExercise extends React.Component {
     }, {
       interval: "M7",
       direction: "asc",
-      song: "M7_asc",
+      song: "maj7_asc",
       title: "Take On Me",
     }, {
       interval: "P8",
