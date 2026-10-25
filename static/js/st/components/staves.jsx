@@ -12,6 +12,7 @@ import {parseNote, noteStaffOffset, MIDDLE_C_PITCH} from "st/music"
 import StaffNotes from "st/components/staff_notes"
 import StaffSongNotes from "st/components/staff_song_notes"
 import styles from "st/components/staff.module.css"
+import {assetUrl} from "st/globals"
 
 const DEFAULT_HEIGHT = 120
 const DEFAULT_MARGIN = 60
@@ -151,7 +152,7 @@ export class Staff extends React.PureComponent {
 
     let sigClass = keySignature.isFlat() ? styles.flat : styles.sharp;
 
-    let src = keySignature.isFlat() ? "/static/svg/flat.svg" : "/static/svg/sharp.svg";
+    let src = keySignature.isFlat() ? assetUrl("/static/svg/flat.svg") : assetUrl("/static/svg/sharp.svg");
 
     return <div className={styles.key_signature}>
       {sigNotes.map((n, i) => {
@@ -178,7 +179,7 @@ export class GStaff extends Staff {
     keySignatureCenter: "F6",
     upperRow: 45,
     lowerRow: 37,
-    cleffImage: "/static/svg/clefs.G.svg",
+    cleffImage: assetUrl("/static/svg/clefs.G.svg"),
     staffClass: styles.g_staff,
   }
 }
@@ -188,7 +189,7 @@ export class FStaff extends Staff {
     keySignatureCenter: "F4",
     upperRow: 33,
     lowerRow: 25,
-    cleffImage: "/static/svg/clefs.F_change.svg",
+    cleffImage: assetUrl("/static/svg/clefs.F_change.svg"),
     staffClass: styles.f_staff,
   }
 }

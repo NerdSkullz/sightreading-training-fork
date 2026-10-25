@@ -12,6 +12,7 @@ import DevicePickerLightbox from "st/components/device_picker_lightbox"
 
 import {dispatch, trigger} from "st/events"
 import {readConfig, writeConfig} from "st/config"
+import {BASE_PATH} from "st/globals"
 
 import * as React from "react"
 import {BrowserRouter, Route, Routes, Navigate} from "react-router-dom"
@@ -243,7 +244,7 @@ export default class App extends React.Component {
   static Layout = Layout
 
   render() {
-    return <BrowserRouter>
+    return <BrowserRouter basename={BASE_PATH}>
       <Layout />
     </BrowserRouter>
   }

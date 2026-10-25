@@ -1,0 +1,62 @@
+name: "build and deploy"
+
+# every push and pull request is built, pushes to master are also published
+# to GitHub Pages
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+# one deployment at a time, without cancelling one that is in progress
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v7
+
+    - uses: actions/setup-node@v7
+      with:
+        node-version: 22
+        cache: npm
+
+    - name: npm install
+      run: npm ci
+
+    - name: configure pages
+      id: pages
+      if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+      uses: actions/configure-pages@v6
+
+    # base_path is the repository's sub-path on github.io, empty otherwise
+    - name: build
+      run: npm run build
+      env:
+        BASE_PATH: ${{ steps.pages.outputs.base_path }}
+
+    - name: upload site
+      if: steps.pages.outcome == 'success'
+      uses: actions/upload-pages-artifact@v5
+      with:
+        path: dist
+
+  deploy:
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+    needs: build
+    runs-on: ubuntu-latest
+
+    permissions:
+      pages: write
+      id-token: write
+
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    - id: deployment
+      uses: actions/deploy-pages@v5

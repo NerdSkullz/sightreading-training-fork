@@ -16,7 +16,7 @@ import {isMobile} from "st/browser"
 
 import {IconShuffle} from "st/components/icons"
 
-import {setTitle} from "st/globals"
+import {setTitle, assetUrl} from "st/globals"
 
 import pageContainerStyles from "../page_container.module.css"
 import parentStyles from "../pages/ear_training_page.module.css"
@@ -129,7 +129,7 @@ export default class MelodyRecognitionExercise extends React.Component {
     if (!this.melodyCache[name]) {
       this.melodyCache[name] = new Promise((resolve, reject) => {
         let request = new XMLHttpRequest()
-        request.open("GET", `/static/music/interval_melodies/${name}.lml?${+new Date()}`)
+        request.open("GET", assetUrl(`/static/music/interval_melodies/${name}.lml?${+new Date()}`))
         request.onerror = () => reject(request.statusText)
         request.onload = (e) => {
           let songText = request.responseText

@@ -11,6 +11,7 @@ import Lightbox from "st/components/lightbox"
 import {toggleActive} from "st/components/util"
 
 import styles from "./header.module.css"
+import {assetUrl} from "st/globals"
 
 class SizedElement extends React.Component {
   constructor(props) {
@@ -137,8 +138,8 @@ export default class Header extends React.Component {
 
     return <div className={styles.header}>
       <Link to="/" className={styles.logo_link}>
-        <img className={styles.logo} src="/static/img/logo.svg" height="35" alt="" />
-        <img className={styles.logo_small} src="/static/img/logo-small.svg" height="35" alt="" />
+        <img className={styles.logo} src={assetUrl("/static/img/logo.svg")} height="35" alt="" />
+        <img className={styles.logo_small} src={assetUrl("/static/img/logo-small.svg")} height="35" alt="" />
       </Link>
 
       <SizedElement className={styles.user_links} onWidth={(w) => {

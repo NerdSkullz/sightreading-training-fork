@@ -4,6 +4,7 @@ import {parseNote, noteStaffOffset} from "st/music"
 
 import * as types from "prop-types"
 import styles from "st/components/staff.module.css"
+import {assetUrl} from "st/globals"
 
 export default class WholeNotes extends React.PureComponent {
   static propTypes = {
@@ -80,19 +81,19 @@ export default class WholeNotes extends React.PureComponent {
     }, noteClasses, props.staticNoteClasses)
 
     let parts = [
-      <img key="head" className={styles.primary} src="/static/svg/noteheads.s0.svg" />
+      <img key="head" className={styles.primary} src={assetUrl("/static/svg/noteheads.s0.svg")} />
     ]
 
     if (accidentals == 0) {
-      parts.push(<img key="natural" className={classNames(styles.accidental, styles.natural)} src="/static/svg/natural.svg" />)
+      parts.push(<img key="natural" className={classNames(styles.accidental, styles.natural)} src={assetUrl("/static/svg/natural.svg")} />)
     }
 
     if (accidentals == -1) {
-      parts.push(<img key="flat" className={classNames(styles.accidental, styles.flat)} src="/static/svg/flat.svg" />)
+      parts.push(<img key="flat" className={classNames(styles.accidental, styles.flat)} src={assetUrl("/static/svg/flat.svg")} />)
     }
 
     if (accidentals == 1) {
-      parts.push(<img key="sharp" className={classNames(styles.accidental, styles.sharp)} src="/static/svg/sharp.svg" />)
+      parts.push(<img key="sharp" className={classNames(styles.accidental, styles.sharp)} src={assetUrl("/static/svg/sharp.svg")} />)
     }
 
     return <div

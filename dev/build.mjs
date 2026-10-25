@@ -2,11 +2,11 @@
 // served by any static file host.
 //
 //   npm run build
+//   BASE_PATH=/repo-name/ npm run build   # when served from a sub-path
 //
-// The app uses absolute /static/... URLs and client side routing, so dist/
-// must be served from the root of a domain, and unknown paths should fall
-// back to index.html (a copy is written to 404.html for hosts like GitHub
-// Pages that serve that file for missing paths).
+// The app uses client side routing, so unknown paths should fall back to
+// index.html (a copy is written to 404.html for hosts like GitHub Pages that
+// serve that file for missing paths).
 
 import {join, dirname} from "path"
 import {fileURLToPath} from "url"
@@ -20,8 +20,11 @@ process.chdir(ROOT)
 
 const DIST = "dist"
 
+// the path the site is served from, with leading and trailing slashes
+const BASE_PATH = `/${process.env.BASE_PATH || ""}/`.replace(/\/+/g, "/")
+
 // static files that are requested at runtime
-const STATIC_DIRS = ["fonts", "img", "music", "soundfonts", "svg"]
+const STATIC_DIRS = ["img", "music", "soundfonts", "svg"]
 
 buildAssets()
 
@@ -35,9 +38,11 @@ const result = await esbuild.build({
   sourcemap: true,
   target: "es2020",
   entryNames: "[name]-[hash]",
+  assetNames: "assets/[name]-[hash]",
   outdir: join(DIST, "static"),
   nodePaths: ["static/js"],
-  external: ["/static/fonts/*"],
+  loader: {".woff": "file", ".woff2": "file"},
+  define: {ST_BASE_PATH: JSON.stringify(BASE_PATH)},
   metafile: true,
   logLevel: "warning",
 })
@@ -53,15 +58,16 @@ for (const file of readdirSync("static/guides").filter(f => f.endsWith(".json"))
 }
 
 // find the hashed bundle names to reference from the page
-const outputs = Object.keys(result.metafile.outputs).map(f => "/" + f.slice(DIST.length + 1))
+const outputs = Object.keys(result.metafile.outputs).map(f => BASE_PATH + f.slice(DIST.length + 1))
 const mainJs = outputs.find(f => /\/main-\w+\.js$/.test(f))
 const mainCss = outputs.find(f => /\/main-\w+\.css$/.test(f))
 
 const html = readFileSync("dev/index.prod.html", "utf8")
   .replace("{{main_css}}", mainCss)
   .replace("{{main_js}}", mainJs)
+  .replaceAll("{{base}}", BASE_PATH)
 
 writeFileSync(join(DIST, "index.html"), html)
 writeFileSync(join(DIST, "404.html"), html)
 
-console.log(`built ${DIST}/ (${mainJs}, ${mainCss})`)
+console.log(`built ${DIST}/ for ${BASE_PATH} (${mainJs}, ${mainCss})`)

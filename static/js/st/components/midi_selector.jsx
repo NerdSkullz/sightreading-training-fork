@@ -3,6 +3,7 @@ import * as types from "prop-types"
 import classNames from "classnames"
 
 import styles from "./midi_selector.module.css"
+import {assetUrl} from "st/globals"
 
 export default class MidiSelector extends React.PureComponent {
   static propTypes = {
@@ -84,7 +85,7 @@ export default class MidiSelector extends React.PureComponent {
             onClick={() => this.handleSelect(i)}
             onKeyDown={(e) => this.handleKeyDown(e, i)}
             >
-            <img className={styles.row_icon} src="/static/img/notes_icon.svg" alt="" />
+            <img className={styles.row_icon} src={assetUrl("/static/img/notes_icon.svg")} alt="" />
             <div className={styles.input_name}>
               {option.name}
             </div>

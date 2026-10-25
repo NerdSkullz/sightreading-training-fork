@@ -34,7 +34,13 @@ npm run build
 ```
 
 This writes a minified, self-contained site to `dist/` that can be served by
-any static file host. It must be served from the root of a domain, and unknown
-paths should fall back to `index.html` so client-side routes like `/about`
-work on reload (`dist/404.html` is a copy of `index.html` for hosts such as
-GitHub Pages).
+any static file host. Unknown paths should fall back to `index.html` so
+client-side routes like `/about` work on reload (`dist/404.html` is a copy of
+`index.html` for hosts such as GitHub Pages). To serve the site from a
+sub-path, set `BASE_PATH`, eg. `BASE_PATH=/my-repo/ npm run build`.
+
+## Deployment
+
+Every push to `master` is built and published to GitHub Pages by
+`.github/workflows/pages.yml`, which sets `BASE_PATH` to the repository's
+Pages path. Other branches and pull requests are built but not published.

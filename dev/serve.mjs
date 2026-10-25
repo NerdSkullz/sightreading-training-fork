@@ -29,7 +29,7 @@ const ctx = await esbuild.context({
   sourcemap: true,
   outdir: "dev/out",
   nodePaths: ["static/js"],
-  external: ["/static/fonts/*"],
+  loader: {".woff": "file", ".woff2": "file"},
   logLevel: "info",
 })
 

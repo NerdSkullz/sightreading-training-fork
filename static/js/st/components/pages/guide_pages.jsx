@@ -1,7 +1,7 @@
 import * as React from "react"
 import {NavLink, Route, Outlet, Navigate} from "react-router-dom"
 import classNames from "classnames"
-import {setTitle} from "st/globals"
+import {setTitle, assetUrl, BASE_PATH} from "st/globals"
 import * as types from "prop-types"
 
 import {toggleActive} from "st/components/util"
@@ -39,7 +39,7 @@ export class GuideContents extends React.PureComponent {
     setTitle(this.props.title)
 
     const request = new XMLHttpRequest()
-    const url = `/static/guides/${this.props.pageSource}.json`
+    const url = assetUrl(`/static/guides/${this.props.pageSource}.json`)
     request.open("GET", url)
     request.send()
 
@@ -54,7 +54,8 @@ export class GuideContents extends React.PureComponent {
 
       let res = JSON.parse(request.responseText)
       this.setState({
-        contents: res.contents
+        // guides link to pages from the root, eg. /play-along
+        contents: res.contents.replace(/href="\//g, `href="${BASE_PATH}`)
       })
     }
 

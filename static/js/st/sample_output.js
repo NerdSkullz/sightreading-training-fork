@@ -4,6 +4,7 @@ import {noteName, parseNote} from "st/music"
 import Soundfont from "soundfont-player"
 
 import {BaseOutputChannel, MidiInput} from "st/midi"
+import {assetUrl} from "st/globals"
 
 export class SampleOutput extends BaseOutputChannel {
   static getInstance() {
@@ -20,7 +21,7 @@ export class SampleOutput extends BaseOutputChannel {
 
     this.promise = Soundfont.instrument(
       new AudioContext(),
-      `/static/soundfonts/MusyngKite/${instrumentName}-mp3.js`
+      assetUrl(`/static/soundfonts/MusyngKite/${instrumentName}-mp3.js`)
     )
       
     this.promise.then((instrument) => {

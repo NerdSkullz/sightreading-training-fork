@@ -2,6 +2,7 @@
 import * as React from "react"
 
 import styles from "./midi_button.module.css"
+import {assetUrl} from "st/globals"
 
 export default function MidiButton(props) {
   return <button
@@ -11,7 +12,7 @@ export default function MidiButton(props) {
     }}
     className={styles.midi_button}>
       <div>
-        <img src="/static/svg/midi.svg" alt="MIDI" />
+        <img src={assetUrl("/static/svg/midi.svg")} alt="MIDI" />
         <span className={styles.current_input_name}>
           {props.midiInput ? props.midiInput.name : "Select device"}
         </span>

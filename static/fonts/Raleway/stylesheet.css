@@ -1,7 +1,7 @@
 @font-face {
     font-family: 'Raleway';
-    src: url("/static/fonts/Raleway/subset-Raleway-Italic.woff2") format('woff2'),
-        url('/static/fonts/Raleway/subset-Raleway-Italic.woff') format('woff');
+    src: url("subset-Raleway-Italic.woff2") format('woff2'),
+        url('subset-Raleway-Italic.woff') format('woff');
     font-weight: normal;
     font-style: italic;
     font-display: swap;
@@ -9,8 +9,8 @@
 
 @font-face {
     font-family: 'Raleway';
-    src: url('/static/fonts/Raleway/subset-Raleway-Black.woff2') format('woff2'),
-        url('/static/fonts/Raleway/subset-Raleway-Black.woff') format('woff');
+    src: url('subset-Raleway-Black.woff2') format('woff2'),
+        url('subset-Raleway-Black.woff') format('woff');
     font-weight: 900;
     font-style: normal;
     font-display: swap;
@@ -18,8 +18,8 @@
 
 @font-face {
     font-family: 'Raleway';
-    src: url('/static/fonts/Raleway/subset-Raleway-Bold.woff2') format('woff2'),
-        url('/static/fonts/Raleway/subset-Raleway-Bold.woff') format('woff');
+    src: url('subset-Raleway-Bold.woff2') format('woff2'),
+        url('subset-Raleway-Bold.woff') format('woff');
     font-weight: bold;
     font-style: normal;
     font-display: swap;
@@ -27,8 +27,8 @@
 
 @font-face {
     font-family: 'Raleway';
-    src: url('/static/fonts/Raleway/subset-Raleway-Regular.woff2') format('woff2'),
-        url('/static/fonts/Raleway/subset-Raleway-Regular.woff') format('woff');
+    src: url('subset-Raleway-Regular.woff2') format('woff2'),
+        url('subset-Raleway-Regular.woff') format('woff');
     font-weight: normal;
     font-style: normal;
     font-display: swap;
