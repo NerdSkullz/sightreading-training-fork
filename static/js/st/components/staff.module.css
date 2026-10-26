@@ -292,10 +292,13 @@
         padding-right: 30px;
         display: inline-flex;
         align-items: center;
+        position: relative;
     }
 
     .touched {
-        margin-left: 5px;
+        position: absolute;
+        top: 100%;
+        left: 0;
         font-weight: normal;
         display: flex;
         height: 35px;
