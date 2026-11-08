@@ -221,6 +221,43 @@ describe("chord generator", function() {
       }
     })
 
+    it("follows I with IV then V, and IV with V", function() {
+      let names = generate({chordProgression: "I-IV-V"})
+
+      // the last chords may have been cut off mid progression
+      for (let i = 0; i < names.length - 2; i++) {
+        if (names[i] == "C") {
+          expect(names.slice(i, i + 3)).toEqual(["C", "F", "G"])
+        }
+
+        if (names[i] == "F") {
+          expect(names[i + 1]).toEqual("G")
+        }
+      }
+
+      // the rest of the chords still come up
+      expect(names).toContain("Dm")
+      expect(names).toContain("Am")
+    })
+
+    it("follows I with IV then V in the blues", function() {
+      let names = generate({
+        chordProgression: "I-IV-V",
+        scale: "blues",
+        extensions: {"7th": true},
+      })
+
+      for (let i = 0; i < names.length - 2; i++) {
+        if (names[i] == "C7") {
+          expect(names.slice(i, i + 3)).toEqual(["C7", "F7", "G7"])
+        }
+
+        if (names[i] == "F7") {
+          expect(names[i + 1]).toEqual("G7")
+        }
+      }
+    })
+
     it("lets V go anywhere when random", function() {
       let names = generate({chordProgression: "random"})
       let afterV = names.filter((name, i) => i > 0 && names[i - 1] == "G")

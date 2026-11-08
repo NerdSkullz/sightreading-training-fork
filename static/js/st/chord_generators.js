@@ -13,9 +13,11 @@ export const CHORD_EXTENSIONS = {
 // names of the progression options, mapped to the scale degrees they step
 // through. Whenever one of these chords comes up, the rest of the progression
 // follows it, eg. for ii-V-I a ii is always followed by V then I, and a V is
-// always followed by I. "random" isn't listed: it has no progression
+// always followed by I, and for I-IV-V a I is always followed by IV then V, and
+// a IV is always followed by V. "random" isn't listed: it has no progression
 export const CHORD_PROGRESSIONS = {
   "ii-V-I": [2, 5, 1],
+  "I-IV-V": [1, 4, 5],
 }
 
 // the blues scale is played over the dominant chords on I, IV and V of the
